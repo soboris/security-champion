@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protected Page</title>
+    <style>
+        .hero-image {
+            background-image: url('/images/secchamp.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Include the common header -->
+    <th:block th:insert="~{header :: header}"></th:block>
+
+    <section class="hero-image">
+        <div class="container text-center">
+            <h1 class="display-4">Welcome to Security Champion 2024</h1>
+            <p class="lead">Try Harder</p>
+        </div>
+    </section>
+
+    <!-- Protected Page Content -->
+    <div class="container mt-5">
+        <h2 class="text-center"></h2>
+        <p id="tokenDisplay"></p>
+        <div id="protectedData"></div>
+    </div>
+
+    <script>
+        // Retrieve the JWT token from localStorage
+        const token = localStorage.getItem('jwtToken');
+
+        if (token) {
+            // console.log('JWT Token on protected page:', token);
+
+            // Send a request to a protected API endpoint, e.g., /api/protected/resources
+            fetch('/api/protected/resources', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,  // Include the JWT token in the request headers
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    alert('Unauthorized. Redirecting to login.');
+                    window.location.href = '/login';  // Redirect to login if token is invalid
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('protectedData').innerText = `Protected Data: ${data.message}`;
+            })
+            .catch(error => console.error('Error fetching protected resource:', error));
+        } else {
+            console.log('No JWT token found in localStorage. Redirecting to login...');
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+</html>

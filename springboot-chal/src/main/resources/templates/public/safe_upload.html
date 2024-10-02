@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload File With Checks</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .hidden {
+            display: none;
+        }
+        .whitelist-info {
+            margin-bottom: 15px;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const fileInput = document.querySelector('input[name="file"]');
+            const maxFileSize = /*[[${maxFileSizeMB}]]*/ 5 * 1024 * 1024; // 5MB as default
+            fileInput.addEventListener("change", function() {
+                const file = fileInput.files[0];
+                if (file && file.size > maxFileSize) {
+                    alert("File size exceeds the maximum allowed limit of " + maxFileSize / (1024 * 1024) + " MB.");
+                    fileInput.value = "";
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Upload File With Checks</h1>
+        <form method="post" action="/pages/upload/with-check" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="file" name="file" class="form-control-file" />
+            </div>
+            <button type="submit" class="btn btn-success">Upload</button>
+        </form>
+        <div class="whitelist-info alert alert-info mt-3" th:if="${whitelistedFileTypes}">
+            <p>Allowed File Types: <span th:text="${whitelistedFileTypes}"></span></p>
+            <p>Allowed File Extensions: <span th:text="${whitelistedExtensions}"></span></p>
+            <p>Maximum File Size: <span th:text="${maxFileSizeMB}"></span> MB</p>
+        </div>
+        <div class="mt-3" th:if="${message}">
+            <p th:utext="${message}" th:class="${danger} ? 'alert alert-danger' : 'alert alert-info'"></p>
+            <div th:if="${!danger}">
+                <p>File Path: <a th:href="${filePath}" target="_new" th:text="${filePath}"></a></p>
+                <p>Virus Scan Result: <span th:text="${virusScanResult}"></span></p>
+            </div>
+        </div>
+        <div th:if="${clamavVersion}">
+            <p>ClamAV Version: <span th:text="${clamavVersion}"></span></p>
+        </div>
+        <div class="mt-3" th:if="${fileType}">
+            <p>File Type: <span th:text="${fileType}" th:class="${danger} ? 'text-danger' : 'text-success'"></span></p>
+            <p>File Extension: <span th:text="${fileExtension}" th:class="${danger} ? 'text-danger' : 'text-success'"></span></p>
+            <p>File Size: <span th:text="${fileSize}"></span> bytes</p>
+        </div>
+        <div class="mt-5">
+            <a href="/pages/upload" class="btn btn-danger">Go to Upload Without Checks</a>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

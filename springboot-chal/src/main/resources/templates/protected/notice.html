@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notices</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Include the common header -->
+    <th:block th:insert="~{header :: header}"></th:block>
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Notices</h2>
+
+        <!-- Table to display notice data -->
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Content</th>
+                    <th>Created By</th>
+                    <th>Created Date</th>
+                    <th id="adminActions" style="display: none;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="noticeList">
+                <!-- Notice rows will be dynamically added here -->
+            </tbody>
+        </table>
+
+        <!-- Textarea to add a new notice -->
+        <h4>Add New Notice</h4>
+        <form id="addNoticeForm">
+            <div class="mb-3">
+                <label for="noticeContent" class="form-label">Notice Content</label>
+                <textarea class="form-control" id="noticeContent" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Notice</button>
+        </form>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('jwtToken');
+        let isAdmin = false;
+
+        // Function to decode the JWT token
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = decodeURIComponent(atob(base64Url).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(base64);
+            } catch (e) {
+                console.error('Failed to decode JWT token');
+                return null;
+            }
+        }
+
+        const decodedToken = parseJwt(token);
+        if (decodedToken && decodedToken.role === 0) {
+            isAdmin = true;  // If the user is an admin
+        }
+
+        // Fetch and display all notices
+        function fetchNotices() {
+            fetch(`${BASE_URL}/api/notices`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to fetch notices');
+                }
+            })
+            .then(data => {
+                displayNotices(data);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Display notices in the table
+        function displayNotices(notices) {
+            const noticeList = document.getElementById('noticeList');
+            noticeList.innerHTML = '';  // Clear the current list
+
+            if (notices.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="5" class="text-center">No notices available</td>`;
+                noticeList.appendChild(tr);
+                return;
+            }
+
+            notices.forEach(notice => {
+                const tr = document.createElement('tr');
+
+                // Notice data columns
+                tr.innerHTML = `
+                    <td>${notice.noticeId}</td>
+                    <td>${notice.noticeContent}</td>
+                    <td>${notice.createdBy}</td>
+                    <td>${new Date(notice.createdDate).toLocaleString()}</td>
+                `;
+
+                if (isAdmin) {
+                    const adminActionsTd = document.createElement('td');
+                    adminActionsTd.innerHTML = `<button class="btn btn-danger btn-sm" onclick="deleteNotice(${notice.noticeId})">Delete</button>`;
+                    tr.appendChild(adminActionsTd);
+                }
+
+                noticeList.appendChild(tr);
+            });
+
+            // Show the admin action column if the user is an admin
+            if (isAdmin) {
+                document.getElementById('adminActions').style.display = 'table-cell';
+            }
+        }
+
+        // Add event listener for the add notice form
+        document.getElementById('addNoticeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const noticeContent = document.getElementById('noticeContent').value;
+            const createdBy = decodedToken.username;
+
+            // Add the new notice
+            fetch(`${BASE_URL}/api/notices/add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    noticeContent: noticeContent,
+                    createdBy: createdBy
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Notice added successfully.');
+                    fetchNotices(); // Reload the notices
+                    document.getElementById('addNoticeForm').reset(); // Clear the form
+                } else {
+                    throw new Error('Failed to add notice');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Delete notice function (admin only)
+        function deleteNotice(noticeId) {
+            if (confirm('Are you sure you want to delete this notice?')) {
+                fetch(`${BASE_URL}/api/notices/delete/${noticeId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Notice deleted successfully.');
+                        fetchNotices(); // Reload the notices
+                    } else {
+                        alert('Failed to delete notice.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+
+        // Initial load of notices
+        fetchNotices();
+    </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    
+</head>
+<body>
+    <!-- Include the common header -->
+    <th:block th:insert="~{header :: header}"></th:block>
+
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-4"> <!-- Limit the width of the form -->
+                <h2 class="text-center">Register</h2>
+                <form id="registerForm" class="mt-4">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="firstname" class="form-label">Firstname</label>
+                        <input type="text" id="firstname" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="lastname" class="form-label">Lastname</label>
+                        <input type="text" id="lastname" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone</label>
+                        <input type="text" id="phone" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const user = {
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                firstname: document.getElementById('firstname').value,
+                lastname: document.getElementById('lastname').value
+            };
+
+            fetch(`${BASE_URL}/api/users/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Registration successful');
+                window.location.href = '/pages/login';
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

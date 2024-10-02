@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+    <h2>WebSocket Ticket Hijack Demo</h2>
+    
+    <div>
+        <label for="ticketMessage">Enter ticket information to send:</label>
+        <input type="text" id="ticketMessage" placeholder="Enter ticket info here">
+        <button onclick="sendMessage()">Send Ticket Info</button>
+    </div>
+
+    <div>
+        <h3>Received Ticket Info (broadcasted from server):</h3>
+        <div id="broadcastMessages"></div>
+    </div>
+
+    <script>
+        var stompClient = null;
+
+        // Connect to WebSocket server
+        function connect() {
+            var socket = new SockJS('/ws');  // Connect to the WebSocket endpoint
+            stompClient = Stomp.over(socket);
+            
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+
+                // Subscribe to the /topic/tickets topic to receive ticket broadcasts
+                stompClient.subscribe('/topic/tickets', function(messageOutput) {
+                    showMessage(messageOutput.body);
+                });
+            });
+        }
+
+        // Send ticket info to /app/tickets
+        function sendMessage() {
+            var messageContent = document.getElementById('ticketMessage').value;
+            
+            if (messageContent && stompClient) {
+                stompClient.send("/app/tickets", {}, messageContent); 
+            }
+        }
+
+        // Display broadcasted messages
+        function showMessage(message) {
+            var broadcastMessages = document.getElementById('broadcastMessages');
+            var messageElement = document.createElement('p');
+            messageElement.innerHTML = message; 
+            broadcastMessages.appendChild(messageElement);
+        }
+
+        // Automatically connect when the page loads
+        window.onload = function() {
+            connect();
+        };
+    </script>
+</body>
+</html>

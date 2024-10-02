@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XXE Vulnerability Demo</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>XML Reader</h1>
+        <p>Enter XML content below</p>
+
+        <form id="xxeForm">
+            <div class="form-group">
+                <label for="xmlContent">Enter XML Content:</label>
+                <textarea id="xmlContent" class="form-control" rows="10" placeholder="Enter your XML here..."></textarea>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="submitXML()">Submit XML</button>
+        </form>
+
+        <div id="response" class="mt-4"></div>
+
+    </div>
+
+    <script>
+        function submitXML() {
+            var xmlContent = document.getElementById("xmlContent").value;
+
+            if (!xmlContent) {
+                document.getElementById("response").innerHTML = "<div class='alert alert-danger'>Please enter XML content.</div>";
+                return;
+            }
+
+            fetch('/pages/xmlreader', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/xml'
+                },
+                body: xmlContent
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("response").innerHTML = "<pre>" + data + "</pre>";
+            })
+            .catch(error => {
+                document.getElementById("response").innerHTML = "<pre>Error: " + error + "</pre>";
+            });
+        }
+    </script>
+</body>
+</html>

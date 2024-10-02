@@ -1,0 +1,88 @@
+services:
+  springboot-chal:
+    build: ./springboot-chal
+    container_name: springboot-chal
+    ports:
+      - "8080:8080"
+    networks:
+      - my_network
+    depends_on:
+      mysql-db:
+        condition: service_healthy  # Wait for MySQL to be healthy
+
+  tomcat-chal:
+    image: tomcat:9.0
+    container_name: tomcat-chal
+    ports:
+      - "18080:8080"
+    volumes:
+      - ./tomcat-chal:/usr/local/tomcat/webapps/ROOT
+    networks:
+      - my_network
+
+  python-flask-chal:
+    build: ./python-flask-chal
+    container_name: python-flask-chal
+    ports:
+      - "5000:5000"
+    networks:
+      - my_network
+
+  # nodejs-chal:
+  #   build: ./nodejs-chal
+  #   container_name: nodejs-chal
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - my_network
+
+  mysql-db:
+    build: ./db
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: P@ssw0rd
+    ports:
+      - "3306:3306"
+    networks:
+      - my_network
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -pP@ssw0rd || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - my_network
+
+  clamav:
+    image: clamav/clamav:latest
+    container_name: clamav
+    environment:
+      - CLAMD_CONF_FILE=/etc/clamav/clamd.conf
+      - FRESHCLAM_CONF_FILE=/etc/clamav/freshclam.conf
+    volumes:
+      - clamav-data:/var/lib/clamav
+      - ./clamav/clamd.conf:/etc/clamav/clamd.conf
+      - ./clamav/freshclam.conf:/etc/clamav/freshclam.conf
+    ports:
+      - "3310:3310"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  mongo-data:
+  clamav-data:
