@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Users</title>
+    <!-- Include Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Include the common header -->
+    <th:block th:insert="~{header :: header}"></th:block>
+    
+    <div class="container mt-5">
+        <h2 class="mb-4">All Users</h2>
+        
+        <!-- Table to display user data -->
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="userList">
+                <!-- User rows will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Check for JWT token in localStorage
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            alert('You need to log in first.');
+            window.location.href = '/pages/login'; // Redirect to login page (Thymeleaf template)
+        }
+
+        // Fetch list of users if token is present
+        fetch(`${BASE_URL}/api/users/getallusers`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Failed to fetch user data');
+            }
+        })
+        .then(users => {
+            const userList = document.getElementById('userList');
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                
+                // User data columns
+                tr.innerHTML = `
+                    <td>${user.userId}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${user.role === 0 ? 'Admin' : 'User'}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="editUser(${user.userId})">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.userId})">Delete</button>
+                    </td>
+                `;
+
+                userList.appendChild(tr);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+
+        // Edit user function
+        function editUser(userId) {
+            // Redirect to the edit page for the user
+            window.location.href = `/pages/protected/edituser?userId=${userId}`;
+        }
+
+        // Delete user function
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                fetch(`${BASE_URL}/api/users/delete/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('User deleted successfully.');
+                        window.location.reload(); // Reload the page to reflect the changes
+                    } else {
+                        alert('Failed to delete user.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
+</body>
+</html>

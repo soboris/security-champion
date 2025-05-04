@@ -1,0 +1,19 @@
+#ticketInfoBar {
+    width: 100%;                /* Make it span the full width */
+    position: relative;          /* Ensure it stays under the header */
+    margin-bottom: 1rem;         /* Add some space between the info bar and the content */
+    background-color: #ffcc80;   /* Warmer color - a light orange */
+    color: #3e2723;              /* Darker text color for contrast */
+    padding: 10px;               /* Add some padding */
+    border-radius: 4px;          /* Slightly round the corners */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for better visibility */
+}
+
+#ticketInfoBar .container {
+    max-width: 1200px;          /* Center the content */
+    margin: 0 auto;
+}
+
+#ticketInfoMessage {
+    font-weight: bold;          /* Make the text bold */
+}

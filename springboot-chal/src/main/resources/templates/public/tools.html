@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tools</title>
+    <!-- Include Bootstrap for styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Include the common header -->
+    <th:block th:insert="~{header :: header}"></th:block>
+    <div class="container mt-5">
+        <!-- Tool buttons with corresponding links -->
+        <div class="d-grid gap-2">
+            <button class="btn btn-light text-start" onclick="openLink('http://localhost:18080/view.jsp?page=files/policy.jsp')" target="_blank">Policy</button>
+
+            <button class="btn btn-light text-start" onclick="openLink('/files/xml.html')" target="_blank">XML Reader</button>
+
+            <button class="btn btn-light text-start" onclick="openLink('/pages/calc')">Foreign Exchange</button>
+
+            <button class="btn btn-light text-start" onclick="openLink('http://localhost:5000')" target="_blank">Calculator</button>
+
+            <button class="btn btn-light text-start" onclick="openLink('http://localhost:18080/fileupload.jsp')" target="_blank">File Upload</button>
+
+            <button class="btn btn-light text-start" onclick="openLink('/pages/safe_upload')" target="_blank">Safe Upload</button>
+            
+        </div>
+    </div>
+
+    <script>
+        // Function to open the link in a new tab for buttons with target="_blank"
+        function openLink(url) {
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<header>
+    <div class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <!-- Include Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+
+        <!-- Script to load the BASE_URL dynamically from application.properties -->
+        <script th:inline="javascript">
+            const BASE_URL = /*[[${@environment.getProperty('app.base-url')}]]*/ 'http://localhost:8080';
+        </script>
+        <link href="/css/main.css" rel="stylesheet">
+        <script src="/js/header.js"></script>
+        <script src="/js/ws.js"></script>
+        
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">SecChamp</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto" id="navLinks">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/help?filePath=help.txt">Help</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/tools">Tools</a>
+                    </li>
+                    <!-- Add User Management Link dynamically for admins -->
+                    <li class="nav-item" id="userMgmtLink" style="display: none;">
+                        <a class="nav-link" href="/pages/protected/usermanagement">User Management</a>
+                    </li>
+                    <!-- Placeholder for Ticket link -->
+                    <li class="nav-item" id="ticketLink" style="display: none;">
+                        <a class="nav-link" href="/pages/protected/tickets/list">Tickets</a>
+                    </li>
+                    <!-- Placeholder for notice link -->
+                    <li class="nav-item" id="noticeLink" style="display: none;">
+                        <a class="nav-link" href="/pages/protected/notice">Notice Board</a>
+                    </li>
+                    <!-- Placeholder for Edit Profile link -->
+                    <li class="nav-item" id="editProfileLink" style="display: none;">
+                        <a class="nav-link" href="#">Edit Profile</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav" id="authLinks">
+                    <!-- Auth links will be added here dynamically -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="ticketInfoBar">
+        <div class="container">
+            <span id="ticketInfoMessage">Ticket info will appear here...</span>
+        </div>
+    </div>
+</header>

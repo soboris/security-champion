@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Details</title>
+</head>
+<body>
+    <!-- Include the common header -->
+    <th:block th:insert="~{header :: header}"></th:block>
+    <div class="container">
+        <h1>Ticket Details</h1>
+
+        <!-- Loop through multiple tickets and display details -->
+        <div th:each="ticket : ${tickets}">
+            <h2 th:text="'Ticket for: ' + ${ticket.passengerName}">Passenger Name</h2>
+            <p><strong>Flight Number:</strong> <span th:text="${ticket.flightNumber}">Flight Number</span></p>
+            <p><strong>Departure Airport:</strong> <span th:text="${ticket.departureAirport}">Departure Airport</span></p>
+            <p><strong>Arrival Airport:</strong> <span th:text="${ticket.arrivalAirport}">Arrival Airport</span></p>
+            <p><strong>Departure Time:</strong> <span th:text="${ticket.departureTime}">Departure Time</span></p>
+            <p><strong>Arrival Time:</strong> <span th:text="${ticket.arrivalTime}">Arrival Time</span></p>
+            <p><strong>Seat Number:</strong> <span th:text="${ticket.seatNumber}">Seat Number</span></p>
+            <p><strong>Ticket Class:</strong> <span th:text="${ticket.ticketClass}">Ticket Class</span></p>
+            <p><strong>Price:</strong> <span th:text="${ticket.price}">Price</span></p>
+            <p><strong>Checked-In:</strong> <span th:text="${ticket.checkedIn ? 'Yes' : 'No'}">Checked-In</span></p>
+            <hr/>
+        </div>
+        
+        <!-- Buttons to navigate back to the ticket list and home -->
+        <a th:href="@{/pages/protected/tickets/list}" class="btn btn-primary">Back to List</a>
+    </div>
+</body>
+</html>

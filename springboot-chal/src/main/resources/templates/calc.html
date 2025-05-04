@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forex Calculator</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .calc-btn {
+            width: 80px;
+            height: 80px;
+            font-size: 24px;
+            margin: 5px;
+        }
+        #amountDisplay {
+            font-size: 16px;
+            height: 40px;
+            width: 200px;
+            margin-bottom: 10px;
+            text-align: right;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .dropdown-short {
+            width: 200px;
+        }
+        .layout-container {
+            display: flex;
+            justify-content: space-around; /* Brings the two sections closer */
+            align-items: flex-start;
+            margin-top: 30px;
+        }
+        .numpad-row {
+            display: flex;
+            justify-content: center;
+        }
+        #resultText {
+            font-size: 2rem; /* Larger font for result */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+   
+    <div class="container mt-5">
+        <h1>Forex Calculator</h1>
+        <p>Enter an amount and select currencies to convert between. The result will be evaluated using server-side template injection.</p>
+
+        <!-- Result display with larger font size -->
+        <div id="result" class="mt-3 mb-3">
+            <h2>Converted Amount:</h2>
+            <!-- Larger font for result display -->
+            <p id="resultText" th:text="${result}">Result will be shown here.</p>
+        </div>
+
+        <div class="layout-container">
+            <!-- Left Section: Textbox and dropdowns -->
+            <div>
+                <!-- Amount display as static text -->
+                <div class="text-left mb-3">
+                    <label>Enter Amount:</label>
+                    <p id="amountDisplay" th:text="${amount}">20</p>
+                </div>
+
+                <!-- Currency selectors -->
+                <div class="form-group">
+                    <label for="fromCurrency">From:</label>
+                    <select class="form-control dropdown-short" id="fromCurrency">
+                        <option value="USD" th:selected="${fromCurrency == 'USD'}">USD - United States Dollar</option>
+                        <option value="EUR" th:selected="${fromCurrency == 'EUR'}">EUR - Euro</option>
+                        <option value="GBP" th:selected="${fromCurrency == 'GBP'}">GBP - British Pound</option>
+                        <option value="HKD" th:selected="${fromCurrency == 'HKD'}">HKD - Hong Kong Dollar</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="toCurrency">To:</label>
+                    <select class="form-control dropdown-short" id="toCurrency">
+                        <option value="EUR" th:selected="${toCurrency == 'EUR'}">EUR - Euro</option>
+                        <option value="USD" th:selected="${toCurrency == 'USD'}">USD - United States Dollar</option>
+                        <option value="GBP" th:selected="${toCurrency == 'GBP'}">GBP - British Pound</option>
+                        <option value="HKD" th:selected="${toCurrency == 'HKD'}">HKD - Hong Kong Dollar</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Right Section: Numpad -->
+            <div>
+                <!-- Number pad -->
+                <div class="numpad">
+                    <div class="numpad-row">
+                        <button class="btn btn-primary calc-btn" onclick="appendToAmount('7')">7</button>
+                        <button class="btn btn-primary calc-btn" onclick="appendToAmount('8')">8</button>
+                        <button class="btn btn-primary calc-btn" onclick="appendToAmount('9')">9</button>
+                    </div>
+                    <div class="numpad-row">
+                        <button class="btn btn-primary calc-btn" onclick="appendToAmount('4')">4</button>
+                        <button class="btn btn-primary calc-btn" onclick="appendToAmount('5')">5</button>
+                        <button class="btn btn-primary calc-btn" onclick="appendToAmount('6')">6</button>
+                    </div>
+                    <div class="numpad-row">
+                        <button class="btn btn-primary calc-btn" onclick="appendToAmount('1')">1</button>
+                        <button class="btn btn-primary calc-btn" onclick="appendToAmount('2')">2</button>
+                        <button class="btn btn-primary calc-btn" onclick="appendToAmount('3')">3</button>
+                    </div>
+                    <div class="numpad-row">
+                        <button class="btn btn-danger calc-btn" onclick="clearAmount()">C</button>
+                        <button class="btn btn-primary calc-btn" onclick="appendToAmount('0')">0</button>
+                        <button class="btn btn-success calc-btn" onclick="submitExpression()">Go</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br /><br />
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- JavaScript to handle the forex calculator logic -->
+    <script>
+        let amount = '';
+
+        const exchangeRates = {
+            USD: { EUR: 0.85, GBP: 0.76, HKD: 7.78 },
+            EUR: { USD: 1.18, GBP: 0.89, HKD: 9.18 },
+            GBP: { USD: 1.31, EUR: 1.12, HKD: 10.29 },
+            HKD: { USD: 0.13, EUR: 0.11, GBP: 0.097 }
+        };
+
+        function appendToAmount(value) {
+            amount += value;
+            document.getElementById('amountDisplay').innerText = amount;
+        }
+
+        function clearAmount() {
+            amount = '';
+            document.getElementById('amountDisplay').innerText = '';
+        }
+
+        function submitExpression() {
+            const fromCurrency = document.getElementById('fromCurrency').value;
+            const toCurrency = document.getElementById('toCurrency').value;
+            const rate = exchangeRates[fromCurrency][toCurrency];
+
+            if (rate && amount) {
+                const expression = `${amount} * ${rate}`;
+                // Redirect to the same page with the expression and form values as query parameters
+                window.location.href = `/pages/calc?expression=${encodeURIComponent(expression)}&amount=${amount}&fromCurrency=${fromCurrency}&toCurrency=${toCurrency}`;
+            } else {
+                document.getElementById('resultText').innerText = 'Invalid input or unsupported conversion.';
+            }
+        }
+
+        // Function to read and preserve query parameters for the result, amount, and dropdown selections
+        window.onload = function () {
+            const params = new URLSearchParams(window.location.search);
+            const result = params.get("result");
+            const amountParam = params.get("amount");
+            const fromCurrencyParam = params.get("fromCurrency");
+            const toCurrencyParam = params.get("toCurrency");
+
+            if (result) {
+                document.getElementById("resultText").innerText = result;
+            }
+            if (amountParam) {
+                amount = amountParam;
+                document.getElementById('amountDisplay').innerText = amountParam;
+            }
+            if (fromCurrencyParam) {
+                document.getElementById('fromCurrency').value = fromCurrencyParam;
+            }
+            if (toCurrencyParam) {
+                document.getElementById('toCurrency').value = toCurrencyParam;
+            }
+        };
+    </script>
+</body>
+</html>

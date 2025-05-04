@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload File Without Checks</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Upload File Without Checks</h1>
+        <form method="post" action="/pages/upload/no-check" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="file" name="file" class="form-control-file" />
+            </div>
+            <button type="submit" class="btn btn-danger">Upload</button>
+        </form>
+        <div class="mt-3" th:if="${message}">
+            <p th:text="${message}" class="alert alert-info"></p>
+            <div th:if="${filePath}">
+                <p>File Path: <a th:href="${filePath}" target="_new" th:text="${filePath}"></a></p>
+            </div>
+        </div>
+        <div class="mt-5">
+            <a href="/pages/safe_upload" class="btn btn-success">Go to Upload With Checks</a>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

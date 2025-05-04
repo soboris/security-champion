@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of Tickets</title>
+</head>
+<body>
+    <!-- Include the common header -->
+    <th:block th:insert="~{header :: header}"></th:block>
+
+    <!-- List of Tickets -->
+    <div class="container mt-5">
+        <h2 class="text-center">Top 3 Tickets</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Passenger Name</th>
+                    <th>Flight Number</th>
+                    <th>Departure</th>
+                    <th>Arrival</th>
+                    <th>Seat Number</th>
+                    <th>Ticket Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="ticket : ${tickets}">
+                    <td th:text="${ticket.passengerName}">Passenger Name</td>
+                    <td th:text="${ticket.flightNumber}">Flight Number</td>
+                    <td th:text="${ticket.departureAirport}">Departure Airport</td>
+                    <td th:text="${ticket.arrivalAirport}">Arrival Airport</td>
+                    <td th:text="${ticket.seatNumber}">Seat Number</td>
+                    <td>
+                        <a th:href="@{/pages/protected/tickets/details(id=${ticket.ticketId})}" class="btn btn-info">Details</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
